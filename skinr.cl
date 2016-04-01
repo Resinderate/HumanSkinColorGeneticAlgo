@@ -1,11 +1,11 @@
 (defparameter *x*  (list 1.0 1.0 1.0))
 (defparameter *w1* (list 2.0 2.0 2.0 2.0))
-(defparameter *w2* (list 1.0 1.0 1.0 1.0 1.0))
+(defparameter *w2* (list -1.0 -1.0 -1.0 -1.0 1.0))
 
 
 ; add the dummy each time.
 ; gonna add the dummy at the end instead of the start, too retarded to figure out how to prepend in this moron language.
-(setf *x* (append *x* (list 2.0)))
+
 
 (write *x*)
 (write *w1*)
@@ -24,6 +24,10 @@
 	(loop for i in x and j in y
 	collect (* i j))
 )
+
+(terpri)
+(write (hs (apply '+ (multlist (append (multlist (append *x* '(1.0)) *w1*) '(1.0)) *w2*))))
+(terpri)
 
 
 
