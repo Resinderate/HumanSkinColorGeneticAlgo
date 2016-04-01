@@ -36,3 +36,11 @@
 ; See how that goes.
 ; Then can scale up the the proper results.
 ; The fitness only comes into the first example.
+
+; Some stuff for file io.
+;(let ((in (open "c:/HyperProgramming/Lisp/ron.txt")))
+	;(loop
+	;	for line = (read-line in nil 'eof)
+	;	until (eq line 'eof)
+	;	(vector-push-extend line *x*)
+	;	))
