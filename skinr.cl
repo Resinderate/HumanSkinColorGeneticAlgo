@@ -1,10 +1,35 @@
-(defparameter *x* (make-array 0 :fill-pointer 0 :adjustable t))
+(defparameter *x*  (list 1.0 1.0 1.0))
+(defparameter *w1* (list 1.0 1.0 1.0 1.0))
+(defparameter *w2* (list 1.0 1.0 1.0 1.0 1.0))
 
-(let ((in (open "c:/HyperProgramming/Lisp/ron.txt")))
-	(loop
-		for line = (read-line in nil 'eof)
-		until (eq line 'eof)
-		(vector-push-extend line *x*)
-		))
+
+; add the dummy each time.
+; gonna add the dummy at the end instead of the start, too retarded to figure out how to prepend in this moron language.
+(setf *x* (append *x* (list 2.0)))
 
 (write *x*)
+(write *w1*)
+(write *w2*)
+
+; need a function to multiply the two lists together.
+
+(defun hs (x)
+	(cond
+		((minusp x)		0) 
+		(t 				1)
+	)
+)
+
+(defun multlist (x y)
+	(loop for i in x and j in y
+	collect (* i j))
+)
+
+
+
+
+; Let's do a single runout example I think.
+; See how that goes.
+; Then can scale up the the proper results.
+; The fitness only comes into the first example.
+; C:\HyperProgramming\Lisp\HumanSkinColorGeneticAlgo\skinr.cl
