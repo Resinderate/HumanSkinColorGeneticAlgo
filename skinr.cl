@@ -1,12 +1,21 @@
-;(defparameter *inputs* '())
-;(defparameter *answers*  '())
+; All code written from scratch by team consisting of Ronan Murphy and Kevin Duffy.
 
-; Rate of 10%
-(defparameter *mutationrate* 15)
+; Data input variables.
+(defparameter *inputs* '())
+(defparameter *answers*  '())
+
+(defparameter *testing-inputs* '())
+(defparameter *testing-answers*  '())
+
+; Rate of 80%
+(defparameter *mutationrate* 80)
+; The current generation.
 (defparameter *gen* 0)
-(defparameter *maxgen* 25)
+; The maximum number of generations.
+(defparameter *maxgen* 10)
 
 (defun hs (x)
+	"Heavyside function."
 	(cond
 		((minusp x)		0) 
 		(t 				1)
@@ -20,14 +29,17 @@
 )
 
 (defun sumlist (l)
+	"Add all the elements of a list up"
 	(apply '+ l)
 )
 
 (defun adddummy (l)
+	"Add a dummy value to the end of the list to use with the weights."
 	(append l '(1.0))
 )
 
 (defun multicheck (lists w1 w2)
+	"Doing multiple skincheck's for all of the input data."
 	(loop for l in lists
 		collect (skincheck l w1 w2))
 )
@@ -65,31 +77,38 @@
 			)))
 
 (defun genstartingstate (n)
+	"Generate a starting state of length N. From -1 to 1 for each value."
 	(loop for i upto (- n 1)
 		collect (- (random 2.0) 1)))
 
-(defun test ()
-	(getfitness 
-		(multicheck (parseinputdata (readfromfile "C:/HyperProgramming/Lisp/skinhsl-training-inputs-small.txt")))
-		(readfromfile "C:/HyperProgramming/Lisp/skinhsl-training-outputs-small.txt")))
-
 (defun loaddata ()
+	"Load data from file. Needs to contain correct location of files."
 	(setf *inputs* (parseinputdata (readfromfile "C:/HyperProgramming/Lisp/skinhsl-training-inputs-small.txt")))
 	(setf *answers* (readfromfile "C:/HyperProgramming/Lisp/skinhsl-training-outputs-small.txt"))
-	(write "Finished Loading.."))
+
+	(setf *testing-inputs* (parseinputdata (readfromfile "C:/HyperProgramming/Lisp/skinhsl-testing-inputs-small.txt")))
+	(setf *testing-answers* (readfromfile "C:/HyperProgramming/Lisp/skinhsl-testing-outputs-small.txt"))
+
+	(write "Finished Loading..")
+	(terpri))
 
 
 (defun startingpop ()
-	"Generate 5 pairs of 3 and 4 weight values."
+	"Generate 5 pairs of 4 and 5 weight values."
 	(loop for i upto 4
-		collect (list (genstartingstate 3) (genstartingstate 4))))
+		collect (list (genstartingstate 4) (genstartingstate 5))))
 
 (defun generation (pop)
 	"Do the test multiple times with the different weights. Gives back the inputs with their fitness at the end."
 	(loop for p in pop
 		collect (list p (getfitness (multicheck *inputs* (nth 0 p) (nth 1 p)) *answers*))))
 
+(defun testing-generation (pop)
+	"Generation that uses the testing data instead of the training data."
+		(list pop (getfitness (multicheck *testing-inputs* (nth 0 pop) (nth 1 pop)) *testing-answers*)))
+
 (defun customsort (a b)
+	"Custom sort to allow to sort by fitness."
 	(> (nth 1 a) (nth 1 b)))
 
 (defun sortfitness (pop)
@@ -100,6 +119,7 @@
 	(butlast l))
 
 (defun roulettewheel (l)
+	"Uses roulette wheel selection to get a weighted random pick from the list."
 	(let ((tot (loop for i in l sum (nth 1 i))))
 		(let ((count (random tot)))
 			(loop for i in l 
@@ -108,6 +128,7 @@
 					((<= count 0.0)    (return-from roulettewheel (nth 0 i))))))))
 
 (defun mateparents (a b)
+	"Wrapper for makechild to deal with data formatting."
 	(list (makechild (nth 0 a) (nth 0 b)) (makechild (nth 1 a) (nth 1 b))))
 
 (defun makechild (a b)
@@ -137,7 +158,7 @@
 	(car l))
 
 (defun evolve (inputpop)
-	"Can now get a random weighted value from the list of 4. Should prolly choplast before then though."
+	"Carries out the main portion of the program, iterating over generations of new populations.."
 	(let ((pop (sortfitness (generation inputpop))))
 		(write "Generation ")
 		(write *gen*)
@@ -154,7 +175,7 @@
 		(setf *gen* (+ *gen* 1))
 
 		(cond
-			((>= *gen* *maxgen*) (return-from evolve 'Finished)) 
+			((>= *gen* *maxgen*) (return-from evolve (stripfitness (nth 0 pop))))
 			(t 
 				(evolve
 					(list 	(stripfitness (nth 0 pop)) 
@@ -168,34 +189,24 @@
 		
 		))
 
+(defun run ()
+	"Entry point for the program."
+	(setf *gen* 0)
+	(let ((pop (evolve (startingpop))))
+		(terpri)
+		(write "Run against testing data..")
+		(terpri)
+		(write "Fitness against testing data: ")
+		(write (nth 1 (testing-generation pop)))
+		)
+	'Finished
+	)
 
-;
-;
+; Load the data in.
+(loaddata)
+; Run the program
+(run)
 
-
-
-; Have some weights.
-; Can run this with some data, and input the weights we have here.
-; Get's back the fitness.
-
-; When we have the fitness, can order all of the stuff.
-	; Have the inputs mapped to the fitness?
-
-; Chop the last one.
-; Elite the first two
-
-; Generate 3 more using 6 parents.
-; Use roulette to pick the parents, and then mate them
-
-; Pass them to a function for them to reproduce.
-; Possibly mutate them.
-; Mutate function.
-
-; Then the cycle continues.
-; Looking for some acceptable values.
-
-
-
-
-;C:/HyperProgramming/Lisp/HumanSkinColorGeneticAlgo/skinr.cl
-
+(terpri)
+(write "Enter (run) to run simulation again....")
+(terpri)
